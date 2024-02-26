@@ -15,7 +15,7 @@ class Livre:
         self.upc = ""
         self.categorie = ""
 
-    def __str__(self) :
+    def __str__(self):
         print(f"Titre : {self.titre}")
         print(f"UPC : {self.upc}")
         print("------------------------------------------------")
