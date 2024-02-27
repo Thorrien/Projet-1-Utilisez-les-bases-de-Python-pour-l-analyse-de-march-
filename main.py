@@ -1,10 +1,6 @@
-from script import recuperationLivre, creationDuCsv, incrementationDuLivre
+from script import recuperationLivre, creationDuCsv, incrementationDuLivre, recuperationDesLivresDUneCategorie, recuperationDesCategoriesEtLivres
 from livre import Livre
 
-url = 'http://books.toscrape.com/catalogue/scott-pilgrims-precious-little-life-scott-pilgrim-1_987/index.html'
+url = 'https://books.toscrape.com/index.html'
 
-
-livre, intitules = recuperationLivre(url)
-creationDuCsv(intitules, livre)
-incrementationDuLivre(livre)
-#livre.__str__()
+recuperationDesCategoriesEtLivres(url)
