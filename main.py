@@ -1,6 +1,6 @@
-from script import recuperationLivre, creationDuCsv, incrementationDuLivre, recuperationDesLivresDUneCategorie, recuperationDesCategoriesEtLivres
-from livre import Livre
+from script import recuperationDesCategoriesEtLivres
 
-url = 'https://books.toscrape.com/index.html'
 
-recuperationDesCategoriesEtLivres(url)
+if __name__ == "__main__":
+    url = 'https://books.toscrape.com/index.html'
+    recuperationDesCategoriesEtLivres(url)

@@ -3,15 +3,17 @@ from bs4 import BeautifulSoup
 from livre import Livre
 import csv
 import os
+import time
+
+session = requests.Session()
 
 
 def recuperationLivre(url):
-
-    page = requests.get(url)
+    page = session.get(url)
     soup = BeautifulSoup(page.content, 'html.parser')
     livre = Livre(soup.find('h1').string)
     livre.prix = soup.find("p", class_="price_color").string
-    if soup.find(id="product_description") :
+    if soup.find(id="product_description"):
         livre.description = soup.find(id="product_description").next_sibling.next_sibling.string
     table = soup.table
     livre.upc = table.td.string
@@ -48,30 +50,19 @@ def recuperationLivre(url):
 
     categorie = soup.ul
     livre.categorie = categorie.find_next("a").find_next("a").find_next("a").string
-    print(f"récupération du livre {livre.titre} terminée")
+
     return livre
 
 
 def creationDuCsv(name):
-    intitules = []
-    intitules.append("titre du livre")
-    intitules.append("UPC")
-    intitules.append("Type")
-    intitules.append("Prix HT")
-    intitules.append("Prix TTC")
-    intitules.append("Taxes")
-    intitules.append("Revues")
-    intitules.append("En stock")
-    intitules.append("Nombre en stock")
-    intitules.append("Nombre d'étoiles")
-    intitules.append("Catégorie")
-    intitules.append("product_description")
+    intitules = ["titre du livre", "UPC", "Type", "Prix HT", "Prix TTC", "Taxes", "Revues",
+                 "En stock", "Nombre en stock", "Nombre d'étoiles", "Catégorie", "Description produit"]
+
     os.makedirs(os.path.join('Données', name), exist_ok=True)
     chemin_fichier_csv = os.path.join('Données', name, f'{name}.csv')
     with open(chemin_fichier_csv, 'w', encoding="utf-8") as csv_file:
-        writer = csv.writer(csv_file, delimiter=',')
-        writer.writerow(intitules)
-        csv_file.close()
+        writer = csv.DictWriter(csv_file, fieldnames=intitules)
+        writer.writeheader()
 
 
 def incrementationDuLivre(livre, categorie):
@@ -86,7 +77,7 @@ def incrementationDuLivre(livre, categorie):
 def recuperationDesLivresDUneCategorie(url, name):
     listeUrlLivres = []
     listeUrlLivrespropre = []
-    page = requests.get(url)
+    page = session.get(url)
     soup = BeautifulSoup(page.content, 'html.parser')
     listeBlocPrduits = soup.find_all(class_="image_container")
     for element in listeBlocPrduits:
@@ -110,13 +101,14 @@ def recuperationDesLivresDUneCategorie(url, name):
 
 
 def recuperationDesCategoriesEtLivres(url):
+    tps3 = time.time()
     listeUrlsCategories = []
     listeNoms = []
-    page = requests.get(url)
+    page = session.get(url)
     soup = BeautifulSoup(page.content, 'html.parser')
     navList = soup.find(class_="nav nav-list")
     listeDesBalisea = navList.find_all("a")
-    del(listeDesBalisea[0])
+    del (listeDesBalisea[0])
     for element in listeDesBalisea:
         listeUrlsCategories.append(f"https://books.toscrape.com/{element.get('href')}")
         listeNoms.append(element.text.strip())
@@ -127,3 +119,7 @@ def recuperationDesCategoriesEtLivres(url):
         print(f'-------------------------------')
         print(f'Document {nomcategorie}.csv est complet')
         print(f'-------------------------------')
+    tps4 = time.time()    
+    print(f'-------------------------------')
+    print(f'Tous les documents sont créés en {(tps4 - tps3)/60} minutes ')
+    print(f'-------------------------------')

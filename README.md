@@ -17,7 +17,10 @@ pip install -r requirements.txt
 
 
 ## Utilisation
+
 Pour lancer le script, il faut simplement lancer le main.py
+
+** Attention, le temps de traitement peut être long en fonction du contenu du site internet, les derniers tests montrent un temps de traitement de : 02 minutes et 45 secondes environ. **
 
 ## Auteur
 
