@@ -11,7 +11,7 @@ session = requests.Session()
 def recuperationLivre(url):
     page = session.get(url)
     soup = BeautifulSoup(page.content, 'html.parser')
-    livre = Livre(soup.find('h1').string)
+    livre = Livre(soup.find('h1').string, url)
     livre.prix = soup.find("p", class_="price_color").string
     if soup.find(id="product_description"):
         livre.description = soup.find(
@@ -55,9 +55,9 @@ def recuperationLivre(url):
 
     elementImage = soup.find('img')
     urlImage = elementImage['src']
-    urlImage = urlImage.replace("../../",
+    livre.urlImage = urlImage.replace("../../",
                                 "http://books.toscrape.com/")
-    imageTéléchargée = session.get(urlImage)
+    imageTéléchargée = session.get(livre.urlImage)
     livre.lienImage = f'{livre.upc}.jpg'
     cheminEnregistrement = os.path.join('Données',
                                         livre.categorie,
@@ -70,10 +70,12 @@ def recuperationLivre(url):
 
 
 def creationDuCsv(name):
-    intitules = ["titre du livre", "UPC", "Type", "Prix HT",
-                 "Prix TTC", "Taxes", "Revues",
-                 "En stock", "Nombre en stock", "Nombre d'étoiles",
-                 "Catégorie", "Lien image", "Description produit"]
+    intitules = ["product_page_url", "universal_ product_code",
+                 "title", "price_including_tax",
+                 "price_excluding_tax", "number_available",
+                 "product_description", "category",
+                 "review_rating", "image_url", "Revues",
+                 "Nom fichier image"]
 
     os.makedirs(os.path.join('Données', name), exist_ok=True)
     chemin_fichier_csv = os.path.join('Données', name, f'{name}.csv')
@@ -83,9 +85,11 @@ def creationDuCsv(name):
 
 
 def incrementationDuLivre(livre, categorie):
-    ligne = [livre.titre, livre.upc, livre.type, livre.prixHT, livre.prix,
-             livre.taxe, livre.revues, livre.stock, livre.nombreStock,
-             livre.note, livre.categorie, livre.lienImage, livre.description]
+    ligne = [livre.pageUrl, livre.upc, livre.titre, livre.prix,
+             livre.prixHT, livre.nombreStock, livre.description,
+             livre.categorie, livre.note, livre.urlImage,
+             livre.revues, livre.lienImage]
+    
     chemin_fichier_csv = os.path.join('Données', categorie, f'{categorie}.csv')
     with open(chemin_fichier_csv, "a", newline="",
               encoding="utf-8") as f_object:

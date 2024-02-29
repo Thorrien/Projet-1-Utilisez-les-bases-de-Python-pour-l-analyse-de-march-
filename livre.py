@@ -1,8 +1,9 @@
 
 
 class Livre:
-    def __init__(self, titre):
+    def __init__(self, titre, pageUrl):
         self.titre = titre
+        self.pageUrl = pageUrl
         self.prix = ""
         self.prixHT = ""
         self.stock = True
@@ -15,6 +16,7 @@ class Livre:
         self.upc = ""
         self.categorie = ""
         self.lienImage = ""
+        self.urlImage = ""
 
     def __str__(self):
         print(f"Titre : {self.titre}")
