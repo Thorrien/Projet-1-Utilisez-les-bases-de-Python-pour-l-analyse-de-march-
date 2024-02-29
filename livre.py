@@ -14,6 +14,7 @@ class Livre:
         self.revues = 0
         self.upc = ""
         self.categorie = ""
+        self.lienImage = ""
 
     def __str__(self):
         print(f"Titre : {self.titre}")

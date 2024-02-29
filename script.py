@@ -50,13 +50,22 @@ def recuperationLivre(url):
 
     categorie = soup.ul
     livre.categorie = categorie.find_next("a").find_next("a").find_next("a").string
+    
+    elementImage = soup.find('img')
+    urlImage = elementImage['src']
+    urlImage = urlImage.replace("../../", "http://books.toscrape.com/")
+    imageTéléchargée = session.get(urlImage)
+    livre.lienImage = f'{livre.upc}.jpg'
+    cheminEnregistrement = os.path.join('Données', livre.categorie, livre.lienImage)
+    with open(cheminEnregistrement, 'wb') as fichier_image:
+        fichier_image.write(imageTéléchargée.content)
 
     return livre
 
 
 def creationDuCsv(name):
     intitules = ["titre du livre", "UPC", "Type", "Prix HT", "Prix TTC", "Taxes", "Revues",
-                 "En stock", "Nombre en stock", "Nombre d'étoiles", "Catégorie", "Description produit"]
+                 "En stock", "Nombre en stock", "Nombre d'étoiles", "Catégorie", "Lien image", "Description produit"]
 
     os.makedirs(os.path.join('Données', name), exist_ok=True)
     chemin_fichier_csv = os.path.join('Données', name, f'{name}.csv')
@@ -66,12 +75,11 @@ def creationDuCsv(name):
 
 
 def incrementationDuLivre(livre, categorie):
-    ligne = [livre.titre, livre.upc, livre.type, livre.prixHT, livre.prix, livre.taxe, livre.revues, livre.stock, livre.nombreStock, livre.note, livre.categorie, livre.description]
+    ligne = [livre.titre, livre.upc, livre.type, livre.prixHT, livre.prix, livre.taxe, livre.revues, livre.stock, livre.nombreStock, livre.note, livre.categorie, livre.lienImage ,livre.description]
     chemin_fichier_csv = os.path.join('Données', categorie, f'{categorie}.csv')
     with open(chemin_fichier_csv, "a", newline="", encoding="utf-8") as f_object:
         writer = csv.writer(f_object)
         writer.writerow(ligne)
-        f_object.close()
 
 
 def recuperationDesLivresDUneCategorie(url, name):
@@ -109,6 +117,7 @@ def recuperationDesCategoriesEtLivres(url):
     navList = soup.find(class_="nav nav-list")
     listeDesBalisea = navList.find_all("a")
     del (listeDesBalisea[0])
+    
     for element in listeDesBalisea:
         listeUrlsCategories.append(f"https://books.toscrape.com/{element.get('href')}")
         listeNoms.append(element.text.strip())
