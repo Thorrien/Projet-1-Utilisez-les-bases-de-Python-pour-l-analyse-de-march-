@@ -12,10 +12,15 @@ def recuperationLivre(url):
     page = session.get(url)
     soup = BeautifulSoup(page.content, 'html.parser')
     livre = Livre(soup.find('h1').string, url)
-    livre.prix = soup.find("p", class_="price_color").string
+
+# Récupération de la description
+
     if soup.find(id="product_description"):
         livre.description = soup.find(
             id="product_description").next_sibling.next_sibling.string
+
+# Récupération des éléments de la table
+
     table = soup.table
     livre.upc = table.td.string
     livre.type = livre.upc.find_next("td").string
@@ -24,6 +29,7 @@ def recuperationLivre(url):
     livre.taxe = livre.prix.find_next("td").string
     stock = livre.taxe.find_next("td").string
 
+# Double split pour récupérer le nombre dans la chaine de carracatère.
     for partie in stock.split('('):
         for element in partie.split():
             if element.isdigit():
@@ -34,24 +40,34 @@ def recuperationLivre(url):
     else:
         livre.stock = False
 
-    blocNote = soup.find(class_="col-sm-6 product_main")
+# Récupération de la note
 
-    if blocNote.find(class_="star-rating Five"):
-        livre.note = 5
-    elif blocNote.find(class_="star-rating Four"):
-        livre.note = 4
-    elif blocNote.find(class_="star-rating Three"):
-        livre.note = 3
-    elif blocNote.find(class_="star-rating Two"):
-        livre.note = 2
-    elif blocNote.find(class_="star-rating One"):
-        livre.note = 1
-    elif blocNote.find(class_="star-rating Zero"):
-        livre.note = 0
+    blocNote = soup.find(class_="col-sm-6 product_main")
+    notation = blocNote.find_next("p").find_next("p").find_next("p")["class"][1]
+
+    match notation:
+        case "Five":
+            livre.note = 5
+        case "Four":
+            livre.note = 4
+        case "Three":
+            livre.note = 3
+        case "Two":
+            livre.note = 2
+        case "One":
+            livre.note = 1
+        case "Zero":
+            livre.note = 0
+        case _:
+            pass
+
+# récupération de la catégorie
 
     categorie = soup.ul
     livre.categorie = categorie.find_next(
         "a").find_next("a").find_next("a").string
+
+# Récupération de l'image et intégration de l'image dans le dossier correspondant
 
     elementImage = soup.find('img')
     urlImage = elementImage['src']

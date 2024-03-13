@@ -18,9 +18,19 @@ pip install -r requirements.txt
 
 ## Utilisation
 
-Pour lancer le script, il faut simplement lancer le main.py
+Une fois les dépendances installées, exécutez le script main.py à l'aide de la commande suivante :
+```
+python main.py
+```
 
 ** Attention, le temps de traitement peut être long en fonction du contenu du site internet, les derniers tests montrent un temps de traitement de : 05 minutes et 05 secondes environ. **
+
+## Résultat
+
+Les données récupérées seront enregistrées dans le dossier Données et les sous dossier portant le nom de chaque catégorie. Dans ces dossiers vous trouverez : 
+- Les csv des données
+- les images de chaque livre ayant comme nom l'UPC
+
 
 ## Auteur
 
